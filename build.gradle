@@ -22,7 +22,11 @@ repositories {
 
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
+    implementation 'io.rest-assured:rest-assured:3.3.0'
+    implementation 'io.rest-assured:json-path:3.3.0'
+
     implementation 'com.google.guava:guava:27.0.1-jre'
+
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
