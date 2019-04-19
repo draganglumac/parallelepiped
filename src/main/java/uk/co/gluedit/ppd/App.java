@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class App {
 
@@ -16,8 +17,11 @@ public class App {
         ForkJoinPool pool = ForkJoinPool.commonPool();
 
         List<String> accounts = new ArrayList<>();
-        accounts.add("12345678901");
-        accounts.add("12345678909");
+        for (int i = 0; i < 1000; i++) {
+            long randy = ThreadLocalRandom.current().nextLong(10000000000L, 99999999999L);
+            accounts.add(Long.toString(randy));
+        }
+        System.out.println("There are " + accounts.size() + " accounts.");
         List<Eligibility> results = pool.invoke(new EligibilityTask(accounts));
         for (Eligibility res : results) {
             System.out.println("{\n" +
