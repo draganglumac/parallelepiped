@@ -1,0 +1,4 @@
+{
+  "isEligible": true, 
+  "accountId": "{{request.requestLine.pathSegments.[1]}}"
+}

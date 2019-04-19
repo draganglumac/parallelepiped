@@ -3,12 +3,31 @@
  */
 package uk.co.gluedit.ppd;
 
+import io.restassured.RestAssured;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+
 public class App {
-    public String getGreeting() {
-        return "Hello world.";
-    }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        RestAssured.baseURI = "http://localhost:8080";
+        ForkJoinPool pool = ForkJoinPool.commonPool();
+
+        List<String> accounts = new ArrayList<>();
+        accounts.add("12345678901");
+        accounts.add("12345678909");
+        List<Eligibility> results = pool.invoke(new EligibilityTask(accounts));
+        for (Eligibility res : results) {
+            System.out.println("{\n" +
+                               "  \"accountId\": " + "\"" + res.getAccountId() + "\",\n" +
+                               "  \"isEligible\": " + res.isEligible() + "\n" +
+                               "}");
+        }
+    }
+
+    public String getGreeting() {
+        return "Hullo from App!";
     }
 }
