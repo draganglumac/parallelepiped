@@ -20,8 +20,10 @@ public class EligibilityTask extends RecursiveTask<List<Eligibility>> {
     private final String urlPattern = "/accounts/{{accountId}}/eligibility";
 
     private final List<String> accounts;
+    private final CircuitBreaker breaker;
 
-    EligibilityTask(List<String> accountIds) {
+    EligibilityTask(List<String> accountIds, CircuitBreaker breaker) {
+        this.breaker = breaker;
         this.accounts = accountIds;
     }
 
@@ -46,6 +48,10 @@ public class EligibilityTask extends RecursiveTask<List<Eligibility>> {
     private Collection<Eligibility> process() {
         List<Eligibility> results = new ArrayList<>();
         for (String account : accounts) {
+            if (breaker.breakCircuit) {
+                return results;
+            }
+
             Response response =
                     when().
                             get(urlPattern.replace("{{accountId}}", account)).
@@ -63,6 +69,7 @@ public class EligibilityTask extends RecursiveTask<List<Eligibility>> {
                                 json.getBoolean("isEligible")
                         )
                 );
+                breaker.breakCircuit = true;
                 return results;
             }
         }
@@ -75,7 +82,7 @@ public class EligibilityTask extends RecursiveTask<List<Eligibility>> {
         int end = threshold;
 
         while (end < accounts.size()) {
-            tasks.add(new EligibilityTask(accounts.subList(start, end)));
+            tasks.add(new EligibilityTask(accounts.subList(start, end), breaker));
             start = end;
             end = Math.min(end + threshold, accounts.size());
         }

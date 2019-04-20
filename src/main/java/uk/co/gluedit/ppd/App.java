@@ -22,7 +22,7 @@ public class App {
             accounts.add(Long.toString(randy));
         }
         System.out.println("There are " + accounts.size() + " accounts.");
-        List<Eligibility> results = pool.invoke(new EligibilityTask(accounts));
+        List<Eligibility> results = pool.invoke(new EligibilityTask(accounts, new CircuitBreaker()));
         for (Eligibility res : results) {
             System.out.println("{\n" +
                                "  \"accountId\": " + "\"" + res.getAccountId() + "\",\n" +
